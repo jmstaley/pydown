@@ -6,6 +6,8 @@ import shutil
 import optparse
 
 from markdown import markdown
+from jinja2 import Environment, PackageLoader
+env = Environment(loader=PackageLoader('pydown', 'templates'))
 
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -48,10 +50,8 @@ def handle(md, dst, theme='web-2.0'):
                 + markdown(item, markdown_options)\
                 + '</div>'\
                 + '</section>\n'
-    index_template = os.path.join(HERE, 'templates', 'index.html')
-    html = codecs.open(index_template, 'r', 'utf-8')
-    html = html.read().replace('<slide>', data)
-    html = html.replace('{{theme}}', theme)
+    template = env.get_template('index.html')
+    html = template.render(slide=data, theme=theme)
     f = codecs.open(os.path.join(dst, 'index.html'), 'w', 'utf-8')
     f.write(html)
     f.close()
@@ -59,7 +59,10 @@ def handle(md, dst, theme='web-2.0'):
 def main():
     '''Main entry point for the pydown CLI.'''
     parser = optparse.OptionParser()
-    parser.add_option("-t", "--theme", dest="theme", default='web-2.0', 
+    # add in the theme option
+    parser.add_option("-t", "--theme", 
+                      dest="theme", 
+                      default='web-2.0', 
                       help="theme to copy")
     (options, args) = parser.parse_args()
     if len(args) != 2:

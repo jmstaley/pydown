@@ -57,11 +57,11 @@ setup(
         'Programming Language :: Python',
 
     ],
-    py_modules=('main', ),
+    py_modules=('pydown', ),
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            "pydown = main:main"
+            "pydown = pydown:main"
         ]
     },
 )
