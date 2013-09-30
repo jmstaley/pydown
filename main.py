@@ -13,7 +13,8 @@ markdown_options = ['extra', 'codehilite']
 
 
 def copy(dst, theme):
-    shutil.rmtree(os.path.join(dst))
+    if os.path.exists(os.path.join(dst)):
+        shutil.rmtree(os.path.join(dst))
     shutil.copytree(os.path.join(HERE, 'templates', 'css'),
                     os.path.join(dst, "css"))
     shutil.copy(os.path.join(HERE, 'templates', 'themes', '%s.css' % theme),
