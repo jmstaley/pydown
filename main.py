@@ -12,10 +12,12 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 markdown_options = ['extra', 'codehilite']
 
 
-def copy(dst):
+def copy(dst, theme):
     try:
         shutil.copytree(os.path.join(HERE, 'templates', 'css'),
                         os.path.join(dst, "css"))
+        shutil.copy(os.path.join(HERE, 'templates', 'themes', '%s.css' % theme),
+                    os.path.join(dst, 'css', '%s.css' % theme))
         shutil.copytree(os.path.join(HERE, 'templates', 'js'),
                         os.path.join(dst, 'js'))
     except:
@@ -35,8 +37,8 @@ def slides_split(slides):
     yield css, data
 
 
-def handle(md, dst):
-    copy(dst)
+def handle(md, dst, theme='web-2.0'):
+    copy(dst, theme)
     slides = codecs.open(md, 'r', 'utf-8').read()
     data = ''
     for css, item in slides_split(slides):
@@ -50,6 +52,7 @@ def handle(md, dst):
     index_template = os.path.join(HERE, 'templates', 'index.html')
     html = codecs.open(index_template, 'r', 'utf-8')
     html = html.read().replace('<slide>', data)
+    html = html.replace('{{theme}}', theme)
     f = codecs.open(os.path.join(dst, 'index.html'), 'w', 'utf-8')
     f.write(html)
     f.close()
@@ -57,11 +60,13 @@ def handle(md, dst):
 def main():
     '''Main entry point for the pydown CLI.'''
     parser = optparse.OptionParser()
+    parser.add_option("-t", "--theme", dest="theme", default='web-2.0', 
+                      help="theme to copy")
     (options, args) = parser.parse_args()
     if len(args) != 2:
         print 'usage: pydown mdfile directory'
     else:
-        handle(*args)
+        handle(*args, theme=options.theme)
 
 if __name__ == '__main__':
     main()
