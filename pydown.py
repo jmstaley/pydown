@@ -38,7 +38,7 @@ def slides_split(slides):
     yield css, data
 
 
-def handle(md, dst, theme='web-2.0'):
+def handle(md, dst, theme='web-2.0', status=False):
     copy(dst, theme)
     slides = codecs.open(md, 'r', 'utf-8').read()
     data = ''
@@ -51,24 +51,31 @@ def handle(md, dst, theme='web-2.0'):
                 + '</div>'\
                 + '</section>\n'
     template = env.get_template('index.html')
-    html = template.render(slide=data, theme=theme)
+    html = template.render(slide=data, theme=theme, status=status)
     f = codecs.open(os.path.join(dst, 'index.html'), 'w', 'utf-8')
     f.write(html)
     f.close()
 
 def main():
     '''Main entry point for the pydown CLI.'''
-    parser = optparse.OptionParser()
+    usage = "usage: %prog [options] mdfile directory"
+    parser = optparse.OptionParser(usage=usage)
     # add in the theme option
     parser.add_option("-t", "--theme", 
                       dest="theme", 
                       default='web-2.0', 
                       help="theme to copy")
+    # deck.js status option
+    parser.add_option("-s", "--status",
+                      action="store_true",
+                      default=False,
+                      dest="status",
+                      help="turn on deck.js status")
     (options, args) = parser.parse_args()
     if len(args) != 2:
-        print 'usage: pydown mdfile directory'
+        parser.print_help()
     else:
-        handle(*args, theme=options.theme)
+        handle(*args, theme=options.theme, status=options.status)
 
 if __name__ == '__main__':
     main()
